@@ -135,7 +135,7 @@ class FrontendRPCServer:
     
     def hearbeat(self):
         while True:
-            time.sleep(1)
+            time.sleep(0.1)
             dead_servers = []
             for serverId in self.alive_servers.keys():
                 count = 0
@@ -147,9 +147,10 @@ class FrontendRPCServer:
                         count = 3
                     except:
                         count += 1
+                    
                 if not alive:
                     dead_servers.append(serverId)
-        
+            
             for id in dead_servers:
                 self.alive_servers.pop(id)
     
