@@ -103,10 +103,10 @@ class FrontendRPCServer:
                 flag = True
             except:
                 return "Get K,V pair from " + str(random_server_id) + "failed."
-            try:
-                self.alive_servers[serverId].deep_copy(kv_store)
-            except:
-                return "Deep Copy of K,V pair to " + str(serverId) + "from" + str(random_server_id) + "failed."
+            # try:
+            self.alive_servers[serverId].deep_copy(kv_store)
+            # except:
+            #     return "Deep Copy of K,V pair to " + str(serverId) + "from" + str(random_server_id) + "failed."
             return "Success in creating new server " + str(serverId) + "K,V copied." + str(kv_store) + str(flag)
 
         return "Success in creating new server " + str(serverId) + "K,V copied."
