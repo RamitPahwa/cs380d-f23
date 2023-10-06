@@ -64,7 +64,7 @@ class KVSRPCServer:
         return json.loads(kv_store)
 
     def deep_copy(self, kv_store):
-        self.KVStore = copy.deep_copy(parse_key_value_string(kv_store))
+        self.KVStore = copy.deepcopy(parse_key_value_string(kv_store))
         # self.KVStore = {key: value for key, value in kv_store.items()}
         return "Deep Copy Success"
 
