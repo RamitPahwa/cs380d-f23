@@ -115,11 +115,13 @@ class FrontendRPCServer:
         serverList = []
         for serverId, _ in self.alive_servers.items():
             serverList.append(serverId)
+
         if(len(serverList) == 0):
             return "ERR_NOSERVERS"
         serverList.sort()
-        resp = ','.join(serverList)
+        resp = ', '.join([str(server) for server in serverList])
         return resp
+        
 
     ## shutdownServer: This function routes the shutdown request to
     ## a server matched with the specified serverId to let the corresponding
