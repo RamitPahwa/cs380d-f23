@@ -92,7 +92,7 @@ class FrontendRPCServer:
         server_ids = list(self.alive_servers.keys())
         if len(server_ids) != 0:
             random_server_id = random.choice(server_ids)
-        
+        flag = False
         self.alive_servers[serverId] = new_server
 
         # More servers exists
@@ -100,12 +100,14 @@ class FrontendRPCServer:
             #need to copy kvs from one server to another
             try:
                 kv_store = self.printKVPairs(random_server_id)
+                flag = True
             except:
                 return "Get K,V pair from " + str(random_server_id) + "failed."
             try:
                 self.alive_servers[serverId].deep_copy(kv_store)
             except:
                 return "Deep Copy of K,V pair to " + str(serverId) + "from" + str(random_server_id) + "failed."
+            return "Success in creating new server " + str(serverId) + "K,V copied." + str(kv_store) + str(flag)
 
         return "Success in creating new server " + str(serverId) + "K,V copied."
 
