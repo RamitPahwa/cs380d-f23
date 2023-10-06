@@ -148,10 +148,10 @@ class FrontendRPCServer:
                     except:
                         count += 1
                 if not alive:
-                    self.alive_servers.pop(serverId)
+                    dead_servers.append(serverId)
         
-            # for id in dead_servers:
-            #     self.alive_servers.pop(serverId)
+            for id in dead_servers:
+                self.alive_servers.pop(serverId)
     
 
 server = SimpleThreadedXMLRPCServer(("localhost", 8001))
