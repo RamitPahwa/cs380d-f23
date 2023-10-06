@@ -118,7 +118,8 @@ class FrontendRPCServer:
         if(len(serverList) == 0):
             return "ERR_NOSERVERS"
         serverList.sort()
-        return serverList
+        resp = ','.join(serverList)
+        return resp
 
     ## shutdownServer: This function routes the shutdown request to
     ## a server matched with the specified serverId to let the corresponding
