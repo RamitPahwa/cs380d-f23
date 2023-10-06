@@ -16,7 +16,7 @@ class KVSRPCServer:
     ## one with new one if the same key already exists.
     def put(self, key, value):
         # print("[Server " + str(serverId) + "] Receive a put request: " + "Key = " + str(key) + ", Val = " + str(value))
-        self.KVStore[key] = value
+        self.KVStore[str(key)] = value
         return "[Server " + str(serverId) + "] Receive a put request: " + "Key = " + str(key) + ", Val = " + str(value) + "Doneee"
 
     def get_local(self, key):
@@ -40,7 +40,7 @@ class KVSRPCServer:
         # concurrent.futures.wait(res, return_when=concurrent.futures.ALL_COMPLETED)
         # return res
         # print("[Server " + str(serverId) + "] Receive a get request: " + "Key = " + str(key))
-        if(key in self.KVStore):
+        if(str(key) in self.KVStore):
             resp = "[Server " + str(serverId) + "] Receive a get request: " + "Key = " + str(key) + " Value = " + str(self.KVStore[key])
         else:
             resp = "ERR_KEY"
