@@ -23,6 +23,10 @@ class KVSRPCServer:
         return self.KVStore[key]
 
     ## get: Get the value associated with the given key.
+    '''
+    Print format - key:value
+    For a “get” operation, if the server doesn’t have a value for the key, the value should be “ERR_KEY”
+    '''
     def get(self, key):
         # with concurrent.futures.ThreadPoolExecutor(max_workers = 16) as executor:
         #     future = executor.submit(self.get_local, (key))
@@ -36,8 +40,11 @@ class KVSRPCServer:
         # concurrent.futures.wait(res, return_when=concurrent.futures.ALL_COMPLETED)
         # return res
         # print("[Server " + str(serverId) + "] Receive a get request: " + "Key = " + str(key))
-        r = "[Server " + str(random_server_id) + "] Receive a get request: " + "Key = " + str(key) + " Value = " + str(self.KVStore[key])
-        return r
+        if(key in self.KVStore):
+            resp = "[Server " + str(serverId) + "] Receive a get request: " + "Key = " + str(key) + " Value = " + str(self.KVStore[key])
+        else:
+            resp = "ERR_KEY"
+        return resp
 
     ## printKVPairs: Print all the key-value pairs at this server.
     def printKVPairs(self):
