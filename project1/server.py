@@ -2,8 +2,8 @@ import argparse
 import xmlrpc.client
 import xmlrpc.server
 import concurrent.futures
-# import json
-# import copy
+import copy
+import ast
 
 serverId = 0
 basePort = 9000
@@ -16,35 +16,27 @@ class KVSRPCServer:
     ## one with new one if the same key already exists.
     def put(self, key, value):
         # print("[Server " + str(serverId) + "] Receive a put request: " + "Key = " + str(key) + ", Val = " + str(value))
-        self.KVStore[str(key)] = value
-        return "[Server " + str(serverId) + "] Receive a put request: " + "Key = " + str(key) + ", Val = " + str(value) + "Doneee"
+        self.KVStore[key] = value
+        return "[Server " + str(serverId) + "] Receive a put request: " + "Key = " + str(key) + ", Val = " + str(value)
 
     def get_local(self, key):
         return self.KVStore[key]
 
     ## get: Get the value associated with the given key.
-    '''
-    Print format - key:value
-    For a “get” operation, if the server doesn’t have a value for the key, the value should be “ERR_KEY”
-    '''
     def get(self, key):
-        # with concurrent.futures.ThreadPoolExecutor(max_workers = 16) as executor:
-        #     future = executor.submit(self.get_local, (key))
-        #     res = []
-        #     for future in concurrent.futures.as_completed(futures):
-        #         result = future.result()
-        #         r = "[Server " + str(random_server_id) + "] Receive a get request: " + "Key = " + str(key) + " Value = " + str(result)
-        #         # yield str(result)
-        #         res.append(result)
-        #     # return res
-        # concurrent.futures.wait(res, return_when=concurrent.futures.ALL_COMPLETED)
-        # return res
+        with concurrent.futures.ThreadPoolExecutor(max_workers = 16) as executor:
+            future = executor.submit(self.get_local, (key))
+            res = []
+            for future in concurrent.futures.as_completed(futures):
+                result = future.result()
+                r = "[Server " + str(random_server_id) + "] Receive a get request: " + "Key = " + str(key) + " Value = " + str(result)
+                # yield str(result)
+                res.append(result)
+            # return res
+        concurrent.futures.wait(res, return_when=concurrent.futures.ALL_COMPLETED)
+        return res
         # print("[Server " + str(serverId) + "] Receive a get request: " + "Key = " + str(key))
-        if(str(key) in self.KVStore):
-            resp = "[Server " + str(serverId) + "] Receive a get request: " + "Key = " + str(key) + " Value = " + str(self.KVStore[key])
-        else:
-            resp = "ERR_KEY"
-        return resp
+        # return self.KVStore[key]
 
     ## printKVPairs: Print all the key-value pairs at this server.
     def printKVPairs(self):
@@ -60,12 +52,11 @@ class KVSRPCServer:
         print("[Server " + str(serverId) + "] is running ..")
         return "OK"
 
-    # def parse_key_value_string(self, kv_store):
-    #     return json.loads(kv_store)
+    def parse_key_value_string(self, kv_store):
+        return ast.literal_eval(kv_store)
 
     def deep_copy(self, kv_store):
-        self.KVStore = copy.deepcopy(ast.literal_eval(kv_store))
-        # self.KVStore = {key: value for key, value in kv_store.items()}
+        self.KVStore = copy.deepcopy(self.parse_key_value_string(kv_store))
         return "Deep Copy Success"
 
 
