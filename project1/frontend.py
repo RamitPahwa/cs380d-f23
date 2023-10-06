@@ -51,6 +51,10 @@ class FrontendRPCServer:
     ## get: This function routes requests from clients to proper
     ## servers that are responsible for getting the value
     ## associated with the given key.
+    '''
+    Print format - key:value
+    For a “get” operation, if the server doesn’t have a value for the key, the value should be “ERR_KEY”
+    '''
     def get(self, key):
         result = ""
         if key in self.locked_keys:
@@ -61,6 +65,14 @@ class FrontendRPCServer:
 
     ## printKVPairs: This function routes requests to servers
     ## matched with the given serverIds.
+    '''
+    Please make it printed like below (newline separated, newline after the very last key value pair as well).
+    Key1:Val1
+    Key2:Val2
+    Key3:Val3
+
+    In the case that the server that the client is trying to connect to does not exist, the value should instead be: “ERR_NOEXIST”.
+    '''
     def printKVPairs(self, serverId):
         count = 0
         while count < 3:
@@ -68,7 +80,8 @@ class FrontendRPCServer:
                 resp = self.alive_servers[serverId].printKVPairs()
                 return resp
             except:
-                resp = "Server {} is dead after retrying 3 times.".format(serverId)
+                # resp = "Server {} is dead after retrying 3 times.".format(serverId)
+                resp = "ERR_NOEXIST"
                 count += 1
         return resp
 
@@ -102,7 +115,9 @@ class FrontendRPCServer:
         serverList = []
         for serverId, _ in self.alive_servers.items():
             serverList.append(serverId)
-        return serverList
+        if(len(serverList) == 0):
+            return "ERR_NOSERVERS"
+        return serverList.sort()
 
     ## shutdownServer: This function routes the shutdown request to
     ## a server matched with the specified serverId to let the corresponding
