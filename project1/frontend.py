@@ -151,7 +151,7 @@ class FrontendRPCServer:
                     dead_servers.append(serverId)
         
             for id in dead_servers:
-                self.alive_servers.pop(serverId)
+                self.alive_servers.pop(id)
     
 
 server = SimpleThreadedXMLRPCServer(("localhost", 8001))
