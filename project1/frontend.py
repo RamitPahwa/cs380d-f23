@@ -140,7 +140,7 @@ class FrontendRPCServer:
     ## listServer: This function prints out a list of servers that
     ## are currently active/alive inside the cluster.
     def listServer(self):
-        heartbeat_util()
+        self.heartbeat_util()
         serverList = []
         for serverId, _ in self.alive_servers.items():
             serverList.append(serverId)
@@ -182,7 +182,7 @@ class FrontendRPCServer:
     def heartbeat(self):
         while True:
             time.sleep(0.1)
-            heartbeat_util()
+            self.heartbeat_util()
             
     
 
