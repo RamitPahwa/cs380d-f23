@@ -58,7 +58,8 @@ class FrontendRPCServer:
     def get(self, key):
         result = ""
         if key in self.locked_keys:
-            time.sleep(0.1)
+            while self.locked_keys[key].locked():
+                time.sleep(0.001)
         random_server_id = random.choice(list(self.alive_servers.keys()))
         # serverId = key % len(self.alive_servers)
         return self.alive_servers[random_server_id].get(key)
