@@ -31,20 +31,18 @@ class FrontendRPCServer:
     ## put: This function routes requests from clients to proper
     ## servers that are responsible for inserting a new key-value
     ## pair or updating an existing one.
-    def put_util(self, func, server, key, value):
+    def put_util(self, func, key, value):
         count = 0
-        resp = ""
+        result = ""
         while count < 5:
             try:
-                # resp = "{}".format(server)
-                resp += func(key, value) + "\n"
-                return resp
+                result += func(key, value) + "\n"
+                return result
             except Exception as e:
-                resp += "Failed {} times:{}:{}\n".format(count, server, str(e))
                 count += 1
                 # time.sleep(0.05 * count)
 
-        return resp[:-1]
+        return result
 
     def put(self, key, value):
         if key not in self.locked_keys:
@@ -53,7 +51,7 @@ class FrontendRPCServer:
         with ThreadPoolExecutor(16) as executor:
             res = []
             for serverId in self.alive_servers.keys():
-                res.append(executor.submit(self.put_util, func=self.alive_servers[serverId].put, server=serverId, key = key, value =value))
+                res.append(executor.submit(self.put_util, func=self.alive_servers[serverId].put, key = key, value =value))
         concurrent.futures.wait(res, return_when=concurrent.futures.ALL_COMPLETED)
         self.locked_keys[key].release()
 
@@ -71,25 +69,18 @@ class FrontendRPCServer:
     For a “get” operation, if the server doesn’t have a value for the key, the value should be “ERR_KEY”
     '''
     def get(self, key):
-        # Making sure this key is not being updates currently
+        # check locked key
         if self.locked_keys.get(key, None) is not None:
             while self.locked_keys[key].locked():
                 time.sleep(0.0001)
-        
-        res = ""
-        # while we know some server is alive, send the value
+
         while len(self.alive_servers.keys()) > 0:
-            lst = list(self.alive_servers.keys())
-            serverId = lst[random.randint(0, len(lst) - 1)]
+            random_serverId = random.choice(list(self.alive_servers.keys()))
             try:
-                get_val = self.alive_servers[serverId].get(key)
-                # res += str(get_val) + "\n{}\n".format(time.time_ns())
-                # return res
+                get_val = self.alive_servers[random_serverId].get(key)
                 return get_val
             except Exception as e:
-                res += "Detected failure for server : {}\n{} | {}\n".format(serverId, time.time_ns(), str(e))
-        
-        # return "No active server.\n{}\n".format(res, time.time_ns())
+                res += "Detected failure for server : {}\n{} | {}\n".format(random_serverId, time.time_ns(), str(e))
         return "ERR_NOEXIST"
 
     ## printKVPairs: This function routes requests to servers
