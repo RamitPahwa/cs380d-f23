@@ -71,25 +71,26 @@ class FrontendRPCServer:
     For a “get” operation, if the server doesn’t have a value for the key, the value should be “ERR_KEY”
     '''
     def get(self, key):
-        resp = ""
-        # if key in self.locked_keys:
-        #     while self.locked_keys[key].locked():
-        #         time.sleep(0.001)
-        count = 0
-        while count < 5:
+        # Making sure this key is not being updates currently
+        if self.locked_keys.get(key, None) is not None:
+            while self.locked_keys[key].locked():
+                time.sleep(0.0001)
+        
+        res = ""
+        # while we know some server is alive, send the value
+        while len(self.kvsServers.keys()) > 0:
+            lst = list(self.kvsServers.keys())
+            serverId = lst[random.randint(0, len(lst) - 1)]
             try:
-                if(len(self.alive_servers) == 0):
-                        self.heartbeat_util()
-                        if(len(self.alive_servers) == 0):
-                                return "ERR_NOSERVERS" 
-                random_server_id = random.choice(list(self.alive_servers.keys()))
-                resp = self.alive_servers[random_server_id].get(key)
-                count = 5
-            except:
-                # resp = "Server {} is dead after retrying 3 times.".format(random_server_id)
-                count += 1
-                # time.sleep(0.05 * count)
-        return resp
+                get_val = self.kvsServers[serverId].get(key)
+                # res += str(get_val) + "\n{}\n".format(time.time_ns())
+                # return res
+                return get_val
+            except Exception as e:
+                res += "Detected failure for server : {}\n{} | {}\n".format(serverId, time.time_ns(), str(e))
+        
+        # return "No active server.\n{}\n".format(res, time.time_ns())
+        return "ERR_NOEXIST"
 
     ## printKVPairs: This function routes requests to servers
     ## matched with the given serverIds.
