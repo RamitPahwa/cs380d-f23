@@ -25,7 +25,7 @@ class KVSRPCServer:
     ## get: Get the value associated with the given key.
     def get(self, key):
         if(key in self.KVStore):
-            resp = "[Server " + str(serverId) + "] Receive a get request: " + "Key = " + str(key) + " Value = " + str(self.KVStore[key])
+            resp = str(key) + ": " + str(self.KVStore[key])
         else:
             resp = "ERR_KEY"
         return resp
