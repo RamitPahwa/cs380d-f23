@@ -140,6 +140,7 @@ class FrontendRPCServer:
     ## listServer: This function prints out a list of servers that
     ## are currently active/alive inside the cluster.
     def listServer(self):
+        heartbeat_util()
         serverList = []
         for serverId, _ in self.alive_servers.items():
             serverList.append(serverId)
@@ -159,26 +160,30 @@ class FrontendRPCServer:
         self.alive_servers.pop(serverId, None)
         return result
     
+    def heartbeat_util(self):
+        dead_servers = []
+        for serverId in self.alive_servers.keys():
+            count = 0
+            alive = False
+            while count < 3:
+                try:
+                    self.alive_servers[serverId].heartBeat()
+                    alive = True
+                    count = 3
+                except:
+                    count += 1
+                
+            if not alive:
+                dead_servers.append(serverId)
+        
+        for dead_server_id in dead_servers:
+            self.alive_servers.pop(dead_server_id, None)
+
     def heartbeat(self):
         while True:
             time.sleep(0.1)
-            dead_servers = []
-            for serverId in self.alive_servers.keys():
-                count = 0
-                alive = False
-                while count < 3:
-                    try:
-                        self.alive_servers[serverId].heartBeat()
-                        alive = True
-                        count = 3
-                    except:
-                        count += 1
-                    
-                if not alive:
-                    dead_servers.append(serverId)
+            heartbeat_util()
             
-            for id in dead_servers:
-                self.alive_servers.pop(id)
     
 
 server = SimpleThreadedXMLRPCServer(("localhost", 8001))
