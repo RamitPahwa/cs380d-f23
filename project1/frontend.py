@@ -38,6 +38,7 @@ class FrontendRPCServer:
                 func(key, value)
                 return
             except Exception as e:
+                self.heartbeat_util()
                 count += 1
                 # time.sleep(0.05 * count)
 
@@ -112,6 +113,7 @@ class FrontendRPCServer:
                 return resp
             except:
                 # resp = "Server {} is dead after retrying 3 times.".format(serverId)
+                self.heartbeat_util()
                 resp = "ERR_NOEXIST"
                 count += 1
                 # time.sleep(0.05*count)
@@ -134,11 +136,13 @@ class FrontendRPCServer:
                 kv_store = self.printKVPairs(random_server_id)
                 flag = True
             except:
+                self.heartbeat_util()
                 return "Get K,V pair from " + str(random_server_id) + "failed."
-            # try:
-            self.alive_servers[serverId].deep_copy(kv_store)
-            # except:
-            #     return "Deep Copy of K,V pair to " + str(serverId) + "from" + str(random_server_id) + "failed."
+            try:
+                self.alive_servers[serverId].deep_copy(kv_store)
+            except:
+                self.heartbeat_util()
+                return "Deep Copy of K,V pair to " + str(serverId) + "from" + str(random_server_id) + "failed."
             return "Success in creating new server " + str(serverId) + "K,V copied." + str(kv_store) + str(flag)
 
         return "Success in creating new server " + str(serverId) + "K,V copied."
