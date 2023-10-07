@@ -24,9 +24,9 @@ class FrontendRPCServer:
         self.locked_keys = defaultdict(Lock)
         self.alive_servers  = dict()
         self.dead_servers = dict()
-        # self.backgroung_thread_for_heartbeat = threading.Thread(target=self.heartbeat)
-        # self.backgroung_thread_for_heartbeat.setDaemon(True)
-        # self.backgroung_thread_for_heartbeat.start()
+        self.backgroung_thread_for_heartbeat = threading.Thread(target=self.heartbeat)
+        self.backgroung_thread_for_heartbeat.setDaemon(True)
+        self.backgroung_thread_for_heartbeat.start()
                 
     ## put: This function routes requests from clients to proper
     ## servers that are responsible for inserting a new key-value
@@ -216,7 +216,7 @@ class FrontendRPCServer:
 
     def heartbeat(self):
         while True:
-            time.sleep(0.1)
+            time.sleep(2)
             self.heartbeat_util()
             
     
