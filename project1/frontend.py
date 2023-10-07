@@ -34,7 +34,7 @@ class FrontendRPCServer:
     def put_util(func, server, key, value):
         count = 0
         resp = ""
-        while count < 3:
+        while count < 5:
             try:
                 # resp = "{}".format(server)
                 resp += func(key, value) + "\n"
@@ -76,11 +76,11 @@ class FrontendRPCServer:
             while self.locked_keys[key].locked():
                 time.sleep(0.001)
         count = 0
-        while count < 3:
+        while count < 5:
             try:
                 random_server_id = random.choice(list(self.alive_servers.keys()))
                 resp = self.alive_servers[random_server_id].get(key)
-                count = 3
+                count = 5
             except:
                 # resp = "Server {} is dead after retrying 3 times.".format(serverId)
                 count += 1
