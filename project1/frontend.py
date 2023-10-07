@@ -61,7 +61,7 @@ class FrontendRPCServer:
         for r in res:
             res_result.append(str(r.result()))
         result = "\n".join(res_result)
-        return result + "Doneee-TestG"
+        return result + "Doneee-Test"
 
     ## get: This function routes requests from clients to proper
     ## servers that are responsible for getting the value
@@ -76,13 +76,13 @@ class FrontendRPCServer:
             while self.locked_keys[key].locked():
                 time.sleep(0.001)
         count = 0
-        while count < 3:
+        while count < 5:
             try:
-                if(len(self.alive_servers) == 0):
+                if(len(self.alive_servers == 0)):
                     return "ERR_NOSERVERS"
                 random_server_id = random.choice(list(self.alive_servers.keys()))
                 resp = self.alive_servers[random_server_id].get(key)
-                count = 3
+                count = 5
             except:
                 # resp = "Server {} is dead after retrying 3 times.".format(random_server_id)
                 count += 1
@@ -140,6 +140,7 @@ class FrontendRPCServer:
     ## listServer: This function prints out a list of servers that
     ## are currently active/alive inside the cluster.
     def listServer(self):
+        heartbeat_util()
         serverList = []
         for serverId, _ in self.alive_servers.items():
             serverList.append(serverId)
@@ -159,26 +160,30 @@ class FrontendRPCServer:
         self.alive_servers.pop(serverId, None)
         return result
     
+    def heartbeat_util(self):
+        dead_servers = []
+        for serverId in self.alive_servers.keys():
+            count = 0
+            alive = False
+            while count < 3:
+                try:
+                    self.alive_servers[serverId].heartBeat()
+                    alive = True
+                    count = 3
+                except:
+                    count += 1
+                
+            if not alive:
+                dead_servers.append(serverId)
+        
+        for dead_server_id in dead_servers:
+            self.alive_servers.pop(dead_server_id, None)
+
     def heartbeat(self):
         while True:
             time.sleep(0.1)
-            dead_servers = []
-            for serverId in self.alive_servers.keys():
-                count = 0
-                alive = False
-                while count < 3:
-                    try:
-                        self.alive_servers[serverId].heartBeat()
-                        alive = True
-                        count = 3
-                    except:
-                        count += 1
-                    
-                if not alive:
-                    dead_servers.append(serverId)
+            heartbeat_util()
             
-            for id in dead_servers:
-                self.alive_servers.pop(id)
     
 
 server = SimpleThreadedXMLRPCServer(("localhost", 8001))
