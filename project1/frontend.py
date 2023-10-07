@@ -78,7 +78,7 @@ class FrontendRPCServer:
         count = 0
         while count < 3:
             try:
-                if(len(self.alive_servers == 0)):
+                if(len(self.alive_servers) == 0):
                     return "ERR_NOSERVERS"
                 random_server_id = random.choice(list(self.alive_servers.keys()))
                 resp = self.alive_servers[random_server_id].get(key)
