@@ -76,7 +76,7 @@ class FrontendRPCServer:
         #     while self.locked_keys[key].locked():
         #         time.sleep(0.001)
         count = 0
-        while count < 3:
+        while count < 5:
             try:
                 if(len(self.alive_servers) == 0):
                         self.heartbeat_util()
@@ -84,7 +84,7 @@ class FrontendRPCServer:
                                 return "ERR_NOSERVERS" 
                 random_server_id = random.choice(list(self.alive_servers.keys()))
                 resp = self.alive_servers[random_server_id].get(key)
-                count = 3
+                count = 5
             except:
                 # resp = "Server {} is dead after retrying 3 times.".format(random_server_id)
                 count += 1
