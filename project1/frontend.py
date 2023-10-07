@@ -42,7 +42,7 @@ class FrontendRPCServer:
             except Exception as e:
                 resp += "Failed {} times:{}:{}\n".format(count, server, str(e))
                 count += 1
-                # time.sleep(0.05 * count)
+                time.sleep(0.05 * count)
 
         return resp[:-1]
 
