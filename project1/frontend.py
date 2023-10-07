@@ -24,9 +24,6 @@ class FrontendRPCServer:
         self.locked_keys = defaultdict(Lock)
         self.alive_servers  = dict()
         self.dead_servers = dict()
-        # self.backgroung_thread_for_heartbeat = threading.Thread(target=self.heartbeat)
-        # self.backgroung_thread_for_heartbeat.setDaemon(True)
-        # self.backgroung_thread_for_heartbeat.start()
                 
     ## put: This function routes requests from clients to proper
     ## servers that are responsible for inserting a new key-value
@@ -41,23 +38,14 @@ class FrontendRPCServer:
                 if(count == 4):
                     dead_servers.append(serverId)
                 count += 1
-                # continue
-            # except Exception as e:
-            #     count += 1
-            #     continue
-                # time.sleep(0.05 * count)
         return
 
     def put(self, key, value):
+        # creating lock object for the key
         if key not in self.locked_keys:
             self.locked_keys[key] = Lock()
         self.locked_keys[key].acquire()
-        # with ThreadPoolExecutor(16) as executor:
-        #     res = []
-        #     keys = list(self.alive_servers.keys())
-        #     for serverId in keys:
-        #         res.append(executor.submit(self.put_util, func=self.alive_servers[serverId].put, key = key, value =value))
-        # concurrent.futures.wait(res, return_when=concurrent.futures.ALL_COMPLETED)
+
         threads = []
         dead_servers = []
         keys = list(self.alive_servers.keys())
@@ -72,10 +60,6 @@ class FrontendRPCServer:
     
         self.locked_keys[key].release()
 
-        # res_result = []
-        # for r in res:
-        #     res_result.append(str(r.result()))
-        # result = "\n".join(res_result)
         return "Success"
 
     ## get: This function routes requests from clients to proper
@@ -123,11 +107,9 @@ class FrontendRPCServer:
                 resp = self.alive_servers[serverId].printKVPairs()
                 return resp
             except:
-                # resp = "Server {} is dead after retrying 3 times.".format(serverId)
                 self.heartbeat_util()
                 resp = "ERR_NOEXIST"
                 count += 1
-                # time.sleep(0.05*count)
         return resp
 
     ## addServer: This function registers a new server with the
@@ -142,7 +124,7 @@ class FrontendRPCServer:
 
         # More servers exists
         if len(self.alive_servers) > 1:
-            #need to copy kvs from one server to another
+            # need to copy kvs from one server to another
             try:
                 kv_store = self.printKVPairs(random_server_id)
                 flag = True
@@ -182,26 +164,6 @@ class FrontendRPCServer:
         return result
     
     def heartbeat_util(self):
-        # alive_servers = []
-        # for serverId in self.dead_servers.keys():
-        #     count = 0
-        #     alive = False
-        #     while count < 10:
-        #         try:
-        #             self.dead_servers[serverId].heartBeat()
-        #             alive = True
-        #             count = 10
-        #         except:
-        #             count += 1
-        #             time.sleep(0.05*count)
-                
-        #     if alive:
-        #         alive_servers.append(serverId)
-        
-        # for alive_server_id in alive_servers:
-        #     self.alive_servers[alive_server_id] = self.dead_servers.pop(alive_server_id, None)
-            
-        
         dead_servers = []
         for serverId in self.alive_servers.keys():
             count = 0
@@ -221,7 +183,7 @@ class FrontendRPCServer:
         for dead_server_id in dead_servers:
             self.dead_servers[dead_server_id] = self.alive_servers.pop(dead_server_id, None)
 
-
+    # background thread for heartbeat, not being used
     def heartbeat(self):
         while True:
             time.sleep(2)
