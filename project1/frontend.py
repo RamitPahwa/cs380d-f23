@@ -50,7 +50,7 @@ class FrontendRPCServer:
         self.locked_keys[key].acquire()
         with ThreadPoolExecutor(16) as executor:
             res = []
-            keys = self.alive_servers.keys()
+            keys = list(self.alive_servers.keys())
             for serverId in keys:
                 res.append(executor.submit(self.put_util, func=self.alive_servers[serverId].put, key = key, value =value))
         concurrent.futures.wait(res, return_when=concurrent.futures.ALL_COMPLETED)
