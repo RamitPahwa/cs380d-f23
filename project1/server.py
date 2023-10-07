@@ -24,17 +24,11 @@ class KVSRPCServer:
 
     ## get: Get the value associated with the given key.
     def get(self, key):
-        with concurrent.futures.ThreadPoolExecutor(max_workers = 16) as executor:
-            future = executor.submit(self.get_local, (key))
-            res = []
-            for future in concurrent.futures.as_completed(futures):
-                result = future.result()
-                r = "[Server " + str(random_server_id) + "] Receive a get request: " + "Key = " + str(key) + " Value = " + str(result)
-                # yield str(result)
-                res.append(result)
-            # return res
-        concurrent.futures.wait(res, return_when=concurrent.futures.ALL_COMPLETED)
-        return res
+        if(str(key) in self.KVStore):
+            resp = "[Server " + str(serverId) + "] Receive a get request: " + "Key = " + str(key) + " Value = " + str(self.KVStore[key])
+        else:
+            resp = "ERR_KEY"
+        return resp
         # print("[Server " + str(serverId) + "] Receive a get request: " + "Key = " + str(key))
         # return self.KVStore[key]
 
