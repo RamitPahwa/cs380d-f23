@@ -74,7 +74,7 @@ class FrontendRPCServer:
         resp = ""
         if key in self.locked_keys:
             while self.locked_keys[key].locked():
-                time.sleep(0.001)
+                time.sleep(0.0001)
         while len(self.alive_servers) > 0:
             random_server_id = random.choice(list(self.alive_servers.keys()))
             try:
