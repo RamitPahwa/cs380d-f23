@@ -48,19 +48,27 @@ class FrontendRPCServer:
         if key not in self.locked_keys:
             self.locked_keys[key] = Lock()
         self.locked_keys[key].acquire()
-        with ThreadPoolExecutor(16) as executor:
-            res = []
-            keys = list(self.alive_servers.keys())
-            for serverId in keys:
-                res.append(executor.submit(self.put_util, func=self.alive_servers[serverId].put, key = key, value =value))
-        concurrent.futures.wait(res, return_when=concurrent.futures.ALL_COMPLETED)
+        # with ThreadPoolExecutor(16) as executor:
+        #     res = []
+        #     keys = list(self.alive_servers.keys())
+        #     for serverId in keys:
+        #         res.append(executor.submit(self.put_util, func=self.alive_servers[serverId].put, key = key, value =value))
+        # concurrent.futures.wait(res, return_when=concurrent.futures.ALL_COMPLETED)
+        threads = []
+        keys = list(self.alive_servers.keys())
+        for serverId in keys:
+            thread = threading.Thread(target=self.put_util, args=(self.alive_servers[serverId].put, key, value))
+            threads.append(thread)
+            thread.start()
+        for thread in threads:
+            thread.join()
         self.locked_keys[key].release()
 
-        res_result = []
-        for r in res:
-            res_result.append(str(r.result()))
-        result = "\n".join(res_result)
-        return result + "Doneee-TestG"
+        # res_result = []
+        # for r in res:
+        #     res_result.append(str(r.result()))
+        # result = "\n".join(res_result)
+        return "Success"
 
     ## get: This function routes requests from clients to proper
     ## servers that are responsible for getting the value
