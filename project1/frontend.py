@@ -71,7 +71,7 @@ class FrontendRPCServer:
     For a “get” operation, if the server doesn’t have a value for the key, the value should be “ERR_KEY”
     '''
     def get(self, key):
-        result = ""
+        resp = ""
         if key in self.locked_keys:
             while self.locked_keys[key].locked():
                 time.sleep(0.001)
