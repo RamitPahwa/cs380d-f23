@@ -53,7 +53,7 @@ class FrontendRPCServer:
         with ThreadPoolExecutor(16) as executor:
             res = []
             for serverId in self.alive_servers.keys():
-                res.append(executor.submit(self.put_util, func=self.alive_servers[serverId].put, key = key, value =value))
+                res.append(executor.submit(self.put_util, func=self.alive_servers[serverId].put, server=serverId, key = key, value =value))
             concurrent.futures.wait(res, return_when=concurrent.futures.ALL_COMPLETED)
         self.locked_keys[key].release()
 
@@ -61,7 +61,7 @@ class FrontendRPCServer:
         for r in res:
             res_result.append(str(r.result()))
         result = "\n".join(res_result)
-        return result + "Doneee"
+        return result + "Doneee-TestG"
 
     ## get: This function routes requests from clients to proper
     ## servers that are responsible for getting the value
