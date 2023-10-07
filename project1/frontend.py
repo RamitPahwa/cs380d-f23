@@ -109,6 +109,7 @@ class FrontendRPCServer:
                 # resp = "Server {} is dead after retrying 3 times.".format(serverId)
                 resp = "ERR_NOEXIST"
                 count += 1
+                # time.sleep(0.05*count)
         return resp
 
     ## addServer: This function registers a new server with the
@@ -165,13 +166,14 @@ class FrontendRPCServer:
         for serverId in self.alive_servers.keys():
             count = 0
             alive = False
-            while count < 3:
+            while count < 10:
                 try:
                     self.alive_servers[serverId].heartBeat()
                     alive = True
-                    count = 3
+                    count = 10
                 except:
                     count += 1
+                    time.sleep(0.05*count)
                 
             if not alive:
                 dead_servers.append(serverId)
