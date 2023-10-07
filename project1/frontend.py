@@ -75,17 +75,19 @@ class FrontendRPCServer:
         if key in self.locked_keys:
             while self.locked_keys[key].locked():
                 time.sleep(0.001)
-        while len(self.alive_servers) > 0:
-            random_server_id = random.choice(list(self.alive_servers.keys()))
+        count = 0
+        while count < 3:
             try:
+                if(len(self.alive_servers) == 0):
+                    return "ERR_NOSERVERS"
+                random_server_id = random.choice(list(self.alive_servers.keys()))
                 resp = self.alive_servers[random_server_id].get(key)
-                return resp
-            except ConnectionRefusedError:
-                self.alive_servers.pop(serverId)
-                continue
+                count = 3
             except:
-                continue
-        return "ERR_NOSERVERS"
+                # resp = "Server {} is dead after retrying 3 times.".format(random_server_id)
+                count += 1
+                # time.sleep(0.05 * count)
+        return resp
 
     ## printKVPairs: This function routes requests to servers
     ## matched with the given serverIds.
