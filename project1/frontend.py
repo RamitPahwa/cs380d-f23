@@ -31,6 +31,21 @@ class FrontendRPCServer:
     ## put: This function routes requests from clients to proper
     ## servers that are responsible for inserting a new key-value
     ## pair or updating an existing one.
+    def put_util(func, server, key, value):
+        count = 0
+        resp = ""
+        while count < 3:
+            try:
+                # resp = "{}".format(server)
+                resp += func(key, value) + "\n"
+                return resp
+            except Exception as e:
+                resp += "Failed {} times:{}:{}\n".format(count, server, str(e))
+                count += 1
+                # time.sleep(0.05 * count)
+
+        return resp[:-1]
+
     def put(self, key, value):
         if key not in self.locked_keys:
             self.locked_keys[key] = Lock()
@@ -38,7 +53,7 @@ class FrontendRPCServer:
         with ThreadPoolExecutor(16) as executor:
             res = []
             for serverId in self.alive_servers.keys():
-                res.append(executor.submit(self.alive_servers[serverId].put, key, value))
+                res.append(executor.submit(self.put_util, func=self.alive_servers[serverId].put, key = key, value =value))
             concurrent.futures.wait(res, return_when=concurrent.futures.ALL_COMPLETED)
         self.locked_keys[key].release()
 
