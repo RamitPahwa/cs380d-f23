@@ -72,9 +72,9 @@ class FrontendRPCServer:
     '''
     def get(self, key):
         resp = ""
-        if key in self.locked_keys:
-            while self.locked_keys[key].locked():
-                time.sleep(0.001)
+        # if key in self.locked_keys:
+        #     while self.locked_keys[key].locked():
+        #         time.sleep(0.001)
         count = 0
         while count < 3:
             try:
