@@ -162,6 +162,26 @@ class FrontendRPCServer:
         return result
     
     def heartbeat_util(self):
+        alive_servers = []
+        for serverId in self.dead_servers.keys():
+            count = 0
+            alive = False
+            while count < 10:
+                try:
+                    self.dead_servers[serverId].heartBeat()
+                    alive = True
+                    count = 10
+                except:
+                    count += 1
+                    time.sleep(0.05*count)
+                
+            if alive:
+                alive_servers.append(serverId)
+        
+        for alive_server_id in alive_servers:
+            self.alive_servers[alive_server_id] = self.dead_servers.pop(alive_server_id, None)
+            
+        
         dead_servers = []
         for serverId in self.alive_servers.keys():
             count = 0
@@ -179,7 +199,8 @@ class FrontendRPCServer:
                 dead_servers.append(serverId)
         
         for dead_server_id in dead_servers:
-            self.alive_servers.pop(dead_server_id, None)
+            self.dead_servers[dead_server_id] = self.alive_servers.pop(dead_server_id, None)
+
 
     def heartbeat(self):
         while True:
