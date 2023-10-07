@@ -21,7 +21,7 @@ class SimpleThreadedXMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer):
 class FrontendRPCServer:
     # TODO: You need to implement details for these functions.
     def __init__(self):
-        self.locked_keys = dict()
+        self.locked_keys = defaultdict(Lock)
         self.alive_servers  = dict()
         self.dead_servers = dict()
         self.backgroung_thread_for_heartbeat = threading.Thread(target=self.heartbeat)
@@ -78,11 +78,11 @@ class FrontendRPCServer:
         
         res = ""
         # while we know some server is alive, send the value
-        while len(self.kvsServers.keys()) > 0:
-            lst = list(self.kvsServers.keys())
+        while len(self.alive_servers.keys()) > 0:
+            lst = list(self.alive_servers.keys())
             serverId = lst[random.randint(0, len(lst) - 1)]
             try:
-                get_val = self.kvsServers[serverId].get(key)
+                get_val = self.alive_servers[serverId].get(key)
                 # res += str(get_val) + "\n{}\n".format(time.time_ns())
                 # return res
                 return get_val
