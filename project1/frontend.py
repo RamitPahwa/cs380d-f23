@@ -31,7 +31,7 @@ class FrontendRPCServer:
     ## put: This function routes requests from clients to proper
     ## servers that are responsible for inserting a new key-value
     ## pair or updating an existing one.
-    def put_util(func, server, key, value):
+    def put_util(self, func, server, key, value):
         count = 0
         resp = ""
         while count < 5:
