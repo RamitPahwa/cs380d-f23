@@ -24,25 +24,24 @@ class FrontendRPCServer:
         self.locked_keys = defaultdict(Lock)
         self.alive_servers  = dict()
         self.dead_servers = dict()
-        self.backgroung_thread_for_heartbeat = threading.Thread(target=self.heartbeat)
-        self.backgroung_thread_for_heartbeat.setDaemon(True)
-        self.backgroung_thread_for_heartbeat.start()
+        # self.backgroung_thread_for_heartbeat = threading.Thread(target=self.heartbeat)
+        # self.backgroung_thread_for_heartbeat.setDaemon(True)
+        # self.backgroung_thread_for_heartbeat.start()
                 
     ## put: This function routes requests from clients to proper
     ## servers that are responsible for inserting a new key-value
     ## pair or updating an existing one.
     def put_util(self, func, key, value):
         count = 0
-        result = ""
         while count < 5:
             try:
-                result += func(key, value) + "\n"
-                return result
+                func(key, value)
+                return
             except Exception as e:
                 count += 1
                 # time.sleep(0.05 * count)
 
-        return result
+        return
 
     def put(self, key, value):
         if key not in self.locked_keys:
