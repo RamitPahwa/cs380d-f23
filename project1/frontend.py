@@ -60,9 +60,16 @@ class FrontendRPCServer:
         if key in self.locked_keys:
             while self.locked_keys[key].locked():
                 time.sleep(0.001)
-        random_server_id = random.choice(list(self.alive_servers.keys()))
-        # serverId = key % len(self.alive_servers)
-        return self.alive_servers[random_server_id].get(key)
+    
+        while count < 3:
+            try:
+                random_server_id = random.choice(list(self.alive_servers.keys()))
+                resp = self.alive_servers[random_server_id].get(key)
+                count = 3
+            except:
+                # resp = "Server {} is dead after retrying 3 times.".format(serverId)
+                count += 1
+        return resp
 
     ## printKVPairs: This function routes requests to servers
     ## matched with the given serverIds.
