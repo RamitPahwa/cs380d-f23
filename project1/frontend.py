@@ -24,9 +24,9 @@ class FrontendRPCServer:
         self.locked_keys = defaultdict(Lock)
         self.alive_servers  = dict()
         self.dead_servers = dict()
-        self.backgroung_thread_for_heartbeat = threading.Thread(target=self.heartbeat)
-        self.backgroung_thread_for_heartbeat.setDaemon(True)
-        self.backgroung_thread_for_heartbeat.start()
+        # self.backgroung_thread_for_heartbeat = threading.Thread(target=self.heartbeat)
+        # self.backgroung_thread_for_heartbeat.setDaemon(True)
+        # self.backgroung_thread_for_heartbeat.start()
                 
     ## put: This function routes requests from clients to proper
     ## servers that are responsible for inserting a new key-value
@@ -90,15 +90,8 @@ class FrontendRPCServer:
                 return get_val
             except Exception as e:
                 print("In Exception of get")
-        self.heartbeat_util()
-        if len(self.alive_servers.keys()) > 0:
-            list_alive = list(self.alive_servers.keys())
-            random_serverId = random.choice(list_alive)
-            try:
-                get_val = self.alive_servers[random_serverId].get(key)
-                return get_val
-            except Exception as e:
-                print("In Exception of get"
+                self.heartbeat_util()
+
         return "ERR_NOEXIST"
 
     ## printKVPairs: This function routes requests to servers
