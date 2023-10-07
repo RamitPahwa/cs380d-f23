@@ -90,6 +90,16 @@ class FrontendRPCServer:
                 return get_val
             except Exception as e:
                 print("In Exception of get")
+        self.heartbeat_util()
+        if len(self.alive_servers.keys()) > 0:
+                while len(self.alive_servers.keys()) > 0:
+                    list_alive = list(self.alive_servers.keys())
+                    random_serverId = random.choice(list_alive)
+                    try:
+                        get_val = self.alive_servers[random_serverId].get(key)
+                        return get_val
+                    except Exception as e:
+                        print("In Exception of get")
         return "ERR_NOEXIST"
 
     ## printKVPairs: This function routes requests to servers
