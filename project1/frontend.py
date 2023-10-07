@@ -82,7 +82,7 @@ class FrontendRPCServer:
                 resp = self.alive_servers[random_server_id].get(key)
                 count = 5
             except:
-                resp = "Server {} is dead after retrying 3 times.".format(random_server_id)
+                # resp = "Server {} is dead after retrying 3 times.".format(random_server_id)
                 count += 1
                 # time.sleep(0.05 * count)
         return resp
