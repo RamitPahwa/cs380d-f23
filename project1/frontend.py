@@ -54,7 +54,7 @@ class FrontendRPCServer:
             res = []
             for serverId in self.alive_servers.keys():
                 res.append(executor.submit(self.put_util, func=self.alive_servers[serverId].put, server=serverId, key = key, value =value))
-            concurrent.futures.wait(res, return_when=concurrent.futures.ALL_COMPLETED)
+        concurrent.futures.wait(res, return_when=concurrent.futures.ALL_COMPLETED)
         self.locked_keys[key].release()
 
         res_result = []
