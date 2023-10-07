@@ -24,8 +24,8 @@ class FrontendRPCServer:
         self.locked_keys = dict()
         self.alive_servers  = dict()
         self.dead_servers = dict()
-        self.backgroung_thread_for_heartbeat = threading.Thread(target=self.hearbeat)
-        self.backgroung_thread_for_heartbeat.daemon = True
+        self.backgroung_thread_for_heartbeat = threading.Thread(target=self.heartbeat)
+        self.backgroung_thread_for_heartbeat.setDaemon(True)
         self.backgroung_thread_for_heartbeat.start()
                 
     ## put: This function routes requests from clients to proper
@@ -159,7 +159,7 @@ class FrontendRPCServer:
         self.alive_servers.pop(serverId, None)
         return result
     
-    def hearbeat(self):
+    def heartbeat(self):
         while True:
             time.sleep(0.1)
             dead_servers = []
