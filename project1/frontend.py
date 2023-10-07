@@ -76,7 +76,8 @@ class FrontendRPCServer:
                 time.sleep(0.0001)
 
         while len(self.alive_servers.keys()) > 0:
-            random_serverId = random.choice(list(self.alive_servers.keys()))
+            list_alive = list(self.alive_servers.keys())
+            random_serverId = random.choice(list_alive)
             try:
                 get_val = self.alive_servers[random_serverId].get(key)
                 return get_val
