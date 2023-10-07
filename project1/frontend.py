@@ -80,7 +80,7 @@ class FrontendRPCServer:
                 get_val = self.alive_servers[random_serverId].get(key)
                 return get_val
             except Exception as e:
-                res += "Detected failure for server : {}\n{} | {}\n".format(random_serverId, time.time_ns(), str(e))
+                print("In Exception of get")
         return "ERR_NOEXIST"
 
     ## printKVPairs: This function routes requests to servers
