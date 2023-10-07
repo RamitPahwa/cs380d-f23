@@ -31,17 +31,21 @@ class FrontendRPCServer:
     ## put: This function routes requests from clients to proper
     ## servers that are responsible for inserting a new key-value
     ## pair or updating an existing one.
-    def put_util(self, func, key, value):
+    def put_util(self, func, serverId, key, value, dead_servers):
         count = 0
         while count < 5:
             try:
                 func(key, value)
                 return
             except Exception as e:
-                self.heartbeat_util()
+                if(count == 4):
+                    dead_servers.append(serverId)
                 count += 1
+                # continue
+            # except Exception as e:
+            #     count += 1
+            #     continue
                 # time.sleep(0.05 * count)
-
         return
 
     def put(self, key, value):
@@ -55,13 +59,17 @@ class FrontendRPCServer:
         #         res.append(executor.submit(self.put_util, func=self.alive_servers[serverId].put, key = key, value =value))
         # concurrent.futures.wait(res, return_when=concurrent.futures.ALL_COMPLETED)
         threads = []
+        dead_servers = []
         keys = list(self.alive_servers.keys())
         for serverId in keys:
-            thread = threading.Thread(target=self.put_util, args=(self.alive_servers[serverId].put, key, value))
+            thread = threading.Thread(target=self.put_util, args=(self.alive_servers[serverId].put, serverId, key, value, dead_servers))
             threads.append(thread)
             thread.start()
         for thread in threads:
             thread.join()
+        for dead_server_id in dead_servers:
+            self.alive_servers.pop(dead_server_id)
+    
         self.locked_keys[key].release()
 
         # res_result = []
@@ -89,9 +97,12 @@ class FrontendRPCServer:
             try:
                 get_val = self.alive_servers[random_serverId].get(key)
                 return get_val
+            except ConnectionRefusedError:
+                self.alive_servers.pop(random_serverId)
+                continue
             except Exception as e:
+                continue
                 print("In Exception of get")
-                self.heartbeat_util()
 
         return "ERR_NOEXIST"
 
@@ -171,24 +182,24 @@ class FrontendRPCServer:
         return result
     
     def heartbeat_util(self):
-        alive_servers = []
-        for serverId in self.dead_servers.keys():
-            count = 0
-            alive = False
-            while count < 10:
-                try:
-                    self.dead_servers[serverId].heartBeat()
-                    alive = True
-                    count = 10
-                except:
-                    count += 1
-                    time.sleep(0.05*count)
+        # alive_servers = []
+        # for serverId in self.dead_servers.keys():
+        #     count = 0
+        #     alive = False
+        #     while count < 10:
+        #         try:
+        #             self.dead_servers[serverId].heartBeat()
+        #             alive = True
+        #             count = 10
+        #         except:
+        #             count += 1
+        #             time.sleep(0.05*count)
                 
-            if alive:
-                alive_servers.append(serverId)
+        #     if alive:
+        #         alive_servers.append(serverId)
         
-        for alive_server_id in alive_servers:
-            self.alive_servers[alive_server_id] = self.dead_servers.pop(alive_server_id, None)
+        # for alive_server_id in alive_servers:
+        #     self.alive_servers[alive_server_id] = self.dead_servers.pop(alive_server_id, None)
             
         
         dead_servers = []
