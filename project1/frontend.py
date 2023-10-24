@@ -30,7 +30,7 @@ class FrontendRPCServer:
     ## pair or updating an existing one.
     def put_util(self, func, serverId, key, value, dead_servers):
         count = 0
-        while count < 5:
+        while count < 100000000:
             try:
                 func(key, value)
                 return
@@ -102,7 +102,7 @@ class FrontendRPCServer:
     '''
     def printKVPairs(self, serverId):
         count = 0
-        while count < 3:
+        while count < 100000000:
             try:
                 resp = self.alive_servers[serverId].printKVPairs()
                 return resp
